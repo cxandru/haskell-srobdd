@@ -1,0 +1,12 @@
+name: bdd
+
+ghc-options: -Wall
+
+dependencies:
+  - base < 5
+  - containers
+  - data-fix
+  - mtl
+
+library:
+  source-dirs: src
