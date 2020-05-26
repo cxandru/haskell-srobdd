@@ -19,6 +19,11 @@ Some nice resources on variance I found:
 These seemingly different occurences of the term 'variance' are actually easy to unite:
 Think of the subtyping relation A ≤ B as equivalent to the existence of a 'conversion function' A → B, and the former concept is subsumed in the latter.
 
+Addendum:
+Again my perception was mistaken: We don't really need TH to even generate the Functor instances, if we construct our structural functor as a _polynomial functor_. This then again requires heavy use of pattern synonyms for concrete instantiations to be legible. Some resources on that topic:
+* [Conor McBride on Usefulness of types. Starts talking about Polynomial Functors at 14:28](https://www.youtube.com/watch?v=3U3lV5VPmOU)
+* [Short Overview of Polynomial Functors](https://riptutorial.com/haskell/example/25923/polynomial-functors)
+
 # TODO
 * Test for functional correctness (preferably using `Quickcheck`, see perhaps [this post mentioning `Arbitrary`](https://blaxill.org/posts/compdata-trees-and-catamorphisms/))
 * Test that we really reduce and share correctly (perhaps write some code to generate a visual representation, or else this should also be doable with `Quickcheck`, provided we find corresponding functional properties)
