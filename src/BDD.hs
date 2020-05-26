@@ -4,7 +4,7 @@
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE LambdaCase #-}
 
-module BDD (robdd, transform, BDDF(..), BDD, FormulaF(..), evalBdd) where
+module BDD (robdd, transform, BDDF(..), BDD, FormulaF(..), Formula, evalBdd) where
 import Prelude hiding (lookup, map, init)
 import Data.Map as Map (Map, (!), lookup, insert, fromAscList)
 import Control.Monad.State (MonadState, get, put, modify, runState)
@@ -99,6 +99,20 @@ robdd f = (get >>=) $ \Context{memoize, bot, top} ->
              Neg sf -> robdd (Bin Imp sf F) -- because of this case not a cataM
              Bin op l r -> join $ on (liftA2 $ apply op) robdd l r
       modify (\s -> s{memoize=insert f r memoize}) >> return r
+
+robdd' :: (Ord a, MonadState (Context a Pointer) s) => Formula a -> s Pointer
+robdd' f = (get >>=) $ \Context{memoize, bot, top} ->
+  case lookup f memoize of
+    Just bdd -> return bdd
+    Nothing -> do
+      r <- case f of
+             T -> return top
+             F -> return bot
+             V a -> createNewAndInsert $ BranchF a bot top
+             --folded out, now strictly compositional!
+             Neg sf -> join $ apply Imp <$> (robdd sf) <*> return bot
+             Bin op l r -> join $ on (liftA2 $ apply op) robdd l r
+      modify (\s -> s{memoize=insert f r memoize}) >> return r      
 
 toBoolMaybe :: (Eq r) => r -> r -> r -> Maybe Bool
 toBoolMaybe bot top p = if p == bot then Just False
